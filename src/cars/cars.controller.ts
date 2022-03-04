@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { AppService } from 'src/app.service';
 import { CarsService } from './cars.service';
-import { CostCalculation } from './dto/cost-calculation.dto';
+import { Days, Month } from './dto/cost-calculation.dto';
 
 @Controller('cars')
 export class CarsController {
@@ -12,14 +12,19 @@ export class CarsController {
     return this.carsService.isCarBooking(id);
   }
 
-  @Post()
-  costCalculation(@Body() calculation: CostCalculation) {
-    return this.carsService.calculateCost(calculation.days);
+  @Post(':id')
+  createReport(@Body() month: Month, @Param('id') id: string, ) {
+    return this.carsService.bookingReport(id, month.month);
   }
 
-  @Post(':id')
-  carBooking() {
-    return this.carsService.bookingCar();
+  @Post()
+  costCalculation(@Body() days: Days) {
+    return this.carsService.calculateCost(days.startDay, days.endDay);
+  }
+
+  @Patch(':id')
+  carBooking(@Body() days: Days, @Param('id') id: string ) {
+    return this.carsService.bookingCar(days.startDay, days.endDay, id);
   }
 
   @Get()
