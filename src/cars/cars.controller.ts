@@ -30,6 +30,5 @@ export class CarsController {
   @Get()
   getCars() {
     return this.carsService.getCars();
-    
   }
 }

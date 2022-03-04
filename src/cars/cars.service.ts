@@ -3,10 +3,6 @@ import query from 'src/app.database';
 
 @Injectable()
 export class CarsService {
-  async getCars() {
-    const { rows } = await query('SELECT * FROM cars');
-    return rows;
-  }
 
   async isCarBooking(id: string) {
     const { rows } = await query('SELECT * FROM cars WHERE id = $1', [id]);
@@ -55,7 +51,7 @@ export class CarsService {
     return `Success! You are booking car with serial number - ${car.serialnumber} from ${dayStart} to ${dayEnd}`;
   }
 
-  async bookingReport(id: string, month: string) {
+  async createReport(id: string, month: string) {
     const car = await query('SELECT serialnumber FROM cars WHERE id = $1', [id]);
     const serialNumber = car.rows[0].serialnumber;
     const { rows } = await query('SELECT * FROM bookinglog WHERE serialnumber = $1 AND month = $2;', [serialNumber, month])
@@ -63,7 +59,17 @@ export class CarsService {
     rows.forEach((element) => {
       allDaysBooking += element.bookingdays;
     });
-    return `Serial Number - ${serialNumber} : % days in booking - ${(allDaysBooking / 30) * 100}%`
+    return {serialNumber, allDaysBooking}
+  }
+
+  async bookingReport(id: string, month: string) {
+    const {serialNumber, allDaysBooking} = await this.createReport(id, month);
+    return {[serialNumber]:`Serial Number - ${serialNumber} : % days in booking - ${(allDaysBooking / 30) * 100}%`}
+  }
+
+  async getCars() {
+    const { rows } = await query('SELECT * FROM cars');
+    const month = String(new Date().getMonth() + 1);
   }
 
 }
