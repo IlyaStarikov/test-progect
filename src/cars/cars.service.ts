@@ -32,6 +32,11 @@ export class CarsService {
   }
 
   async bookingCar(dayStart: string, dayEnd: string, id: string) {
+    const { rows: column } = await query(`SELECT DATE '${dayEnd}' - DATE '${dayStart}';`);
+    const monthDays = column[0]['?column?'];
+    if (monthDays > 30) {
+      return 'Max booking is 30 days'
+    }
     const dateStart = new Date(dayStart).getDay();
     const month = new Date(dayStart).getMonth() + 1;
     const dateEnd = new Date(dayEnd).getDay();
@@ -62,14 +67,28 @@ export class CarsService {
     return {serialNumber, allDaysBooking}
   }
 
-  async bookingReport(id: string, month: string) {
-    const {serialNumber, allDaysBooking} = await this.createReport(id, month);
-    return {[serialNumber]:`Serial Number - ${serialNumber} : % days in booking - ${(allDaysBooking / 30) * 100}%`}
+  async bookingReport() {
+    const month = String(new Date().getMonth() + 1);
+    const { rows: cars } = await query('SELECT * FROM cars');
+    const { rows } = await query('SELECT * FROM cars INNER JOIN bookinglog ON bookinglog.serialnumber = cars.serialnumber AND month = $1', [month]);
+    const report = {};
+    let days = 0;
+    cars.forEach((elem) => {
+      const allBookingDays = rows.reduce((previousValue, currentValue) => {
+        if (elem.serialnumber == currentValue.serialnumber){
+          return Number(previousValue) + Number(currentValue.bookingdays);
+        }
+        return previousValue;
+      }, 0);
+      days += (allBookingDays / 30) * 100;
+      report[elem.serialnumber] = `Serial Number - ${elem.serialnumber} : % days in booking - ${(allBookingDays / 30) * 100}%`
+    });
+    const allPercentDaysBooking = days / cars.length;
+    report['total'] = allPercentDaysBooking;
+    return report
   }
 
   async getCars() {
-    const { rows } = await query('SELECT * FROM cars');
-    const month = String(new Date().getMonth() + 1);
   }
 
 }

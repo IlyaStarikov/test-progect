@@ -12,12 +12,12 @@ export class CarsController {
     return this.carsService.isCarBooking(id);
   }
 
-  @Post(':id')
-  createReport(@Body() month: Month, @Param('id') id: string, ) {
-    return this.carsService.bookingReport(id, month.month);
+  @Post()
+  createReport() {
+    return this.carsService.bookingReport();
   }
 
-  @Post()
+  @Post(':id')
   costCalculation(@Body() days: Days) {
     return this.carsService.calculateCost(days.startDay, days.endDay);
   }
