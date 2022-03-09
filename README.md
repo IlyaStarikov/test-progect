@@ -22,7 +22,22 @@
   ```bash
   $ npm install
   ```
-  3. Запустить приложение с помощью команды:
+  3. Создать файл .env в корне проекта и заполнить его по шаблону:
+
+  ```bash
+  DB_USER = 'USER_NAME'
+  DB_DATABASE = 'DATABASE_NAME'
+  DB_PASSWORD = 'DATABASE_PASSWORD'
+  DB_PORT = DATABASE_PORT
+  ``` 
+
+  где:
+    DB_USER - имя пользователя базы данных,
+    DB_DATABASE - название(имя) базы данных,
+    DB_PASSWORD - пароль доступа к базе данных,
+    DB_PORT - порт, на котором работает база данных
+
+  4. Запустить приложение с помощью команды:
 
   ```bash
   $ npm run start
